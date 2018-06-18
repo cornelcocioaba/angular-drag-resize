@@ -125,6 +125,46 @@
           }
         }
       }
+    },
+    "drag-resize": {
+      "root": "projects/drag-resize",
+      "sourceRoot": "projects/drag-resize/src",
+      "projectType": "library",
+      "prefix": "dnr",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/drag-resize/tsconfig.lib.json",
+            "project": "projects/drag-resize/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/drag-resize/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/drag-resize/src/test.ts",
+            "tsConfig": "projects/drag-resize/tsconfig.spec.json",
+            "karmaConfig": "projects/drag-resize/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/drag-resize/tsconfig.lib.json",
+              "projects/drag-resize/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "angular-drag-resize"

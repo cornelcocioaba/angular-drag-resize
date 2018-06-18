@@ -15,6 +15,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "drag-resize": [
+        "dist/drag-resize"
+      ],
+      "drag-resize/*": [
+        "dist/drag-resize/*"
+      ]
+    }
   }
 }
