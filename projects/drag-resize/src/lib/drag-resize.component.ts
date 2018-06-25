@@ -1,57 +1,50 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, Input } from '@angular/core';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'dnr-drag-resize',
-  template: `
-    <div class="container"
-      [class.active]="draggingWindow"
-      [style.top.px]='y'
-      [style.left.px]='x'
-      [style.width.px]='width'
-      [style.height.px]='height'
-      (mousedown)='onWindowPress($event)'
-      (mousemove)='onWindowDrag($event)'>
-      <div class="handle handle-tl" (mousedown)='onCornerClick($event, topLeftResize)'></div>
-      <div class="handle handle-tr" (mousedown)='onCornerClick($event, topRightResize)'></div>
-      <div class="handle handle-br" (mousedown)='onCornerClick($event, bottomRightResize)'></div>
-      <div class="handle handle-bl" (mousedown)='onCornerClick($event, bottomLeftResize)'></div>
-
-      <div class="content">
-        <ng-content></ng-content>
-      </div>
-    </div>
-  `,
-  styles: [
-    '.container { position: fixed; background-color: black; opacity: 0.8;}',
-    '.handle { position: absolute; width: 10px; height: 10px; border: 2px solid #666666; border-radius: 50%; background-color: #fff;}',
-    '.handle-tl { top: -6px; left: -6px; }',
-    '.handle-tr { top: -6px; right: -6px; }',
-    '.handle-bl { bottom: -6px; left: -6px; }',
-    '.handle-br { bottom: -6px; right: -6px; }',
-  ],
+  templateUrl: './drag-resize.component.html',
+  styleUrls: ['./drag-resize.component.scss'],
 })
 export class DragResizeComponent implements OnInit {
+  @Input() src: string;
+
   x: number;
   y: number;
   px: number;
   py: number;
   width: number;
   height: number;
+
+  ix: number;
+  iy: number;
+  iWidth: number;
+  iHeight: number;
+
   minArea: number;
-  selected: boolean;
   draggingCorner: boolean;
   draggingWindow: boolean;
+  draggingImg: boolean;
   resizer: Function;
+
+  get differentSize() {
+    return this.width !== this.iWidth || this.height !== this.iHeight;
+  }
 
   constructor() {
     this.x = 300;
     this.y = 300;
+    this.ix = 0;
+    this.iy = 0;
     this.px = 0;
     this.py = 0;
-    this.width = 600;
-    this.height = 300;
+    this.width = 375;
+    this.height = 150;
+    this.iWidth = 375;
+    this.iHeight = 150;
     this.draggingCorner = false;
     this.draggingWindow = false;
+    this.draggingImg = false;
     this.minArea = 20000;
   }
 
@@ -62,7 +55,9 @@ export class DragResizeComponent implements OnInit {
   }
 
   onWindowPress(event: MouseEvent) {
-    this.selected = true;
+    if (this.draggingImg) {
+      return;
+    }
     this.draggingWindow = true;
     this.px = event.clientX;
     this.py = event.clientY;
@@ -79,6 +74,31 @@ export class DragResizeComponent implements OnInit {
     this.y += offsetY;
     this.px = event.clientX;
     this.py = event.clientY;
+  }
+
+  onImgPress(event: MouseEvent) {
+    this.draggingWindow = false;
+    this.draggingImg = true;
+
+    this.px = event.clientX;
+    this.py = event.clientY;
+  }
+
+  onImgDrag(event: MouseEvent) {
+    if (!this.draggingImg) {
+      return;
+    }
+
+    const offsetX = event.clientX - this.px;
+    const offsetY = event.clientY - this.py;
+
+    this.ix += offsetX;
+    this.iy += offsetY;
+
+    this.px = event.clientX;
+    this.py = event.clientY;
+
+    this.applyConstraints(offsetX, offsetY);
   }
 
   topLeftResize(offsetX: number, offsetY: number) {
@@ -136,11 +156,44 @@ export class DragResizeComponent implements OnInit {
     }
     this.px = event.clientX;
     this.py = event.clientY;
+
+    this.applyConstraints(offsetX, offsetY);
+  }
+
+  applyConstraints(offsetX: number, offsetY: number) {
+    const left = this.x;
+    const right = left + this.width;
+    const top = this.y;
+    const bottom = top + this.height;
+
+    if (this.ix + this.iWidth < this.width) {
+      this.ix = this.width - this.iWidth;
+    }
+
+    if (this.ix > 0) {
+      this.ix = 0;
+    }
+    if (this.iy + this.iHeight < this.height) {
+      this.iy = this.height - this.iHeight;
+    }
+    if (this.iy > 0) {
+      this.iy = 0;
+    }
+
+    if (this.iHeight < this.height) {
+      // landscape
+      this.iHeight = this.height;
+    }
+    if (this.iWidth < this.width) {
+      // portrait
+      this.iWidth = this.width;
+    }
   }
 
   @HostListener('document:mouseup', ['$event'])
   onCornerRelease(event: MouseEvent) {
     this.draggingWindow = false;
     this.draggingCorner = false;
+    this.draggingImg = false;
   }
 }
