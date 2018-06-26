@@ -21,13 +21,19 @@ export class DragResizeComponent implements OnInit {
   width: number;
   height: number;
 
+  mouseStartAngle: number;
+  elementStartAngle: number;
+  elementCurrentAngle: number;
+
   ix: number;
   iy: number;
   iWidth: number;
   iHeight: number;
 
   selected: boolean;
+
   minArea: number;
+
   draggingCorner: boolean;
   draggingWindow: boolean;
   draggingImg: boolean;
@@ -39,15 +45,28 @@ export class DragResizeComponent implements OnInit {
     return this.width !== this.iWidth || this.height !== this.iHeight;
   }
 
-  constructor(private elementRef: ElementRef) {
-    this.x = 300;
-    this.y = 300;
-    this.ix = 0;
-    this.iy = 0;
+  get rotationTransform() {
+    const degrees = this.radiansToDegree(this.elementCurrentAngle);
+    return `rotate(${degrees}deg)`;
+  }
+
+  constructor(private elementRef: ElementRef) {}
+
+  ngOnInit() {
     this.px = 0;
     this.py = 0;
+
+    this.x = 300;
+    this.y = 300;
     this.width = 375;
     this.height = 150;
+
+    this.mouseStartAngle = 0;
+    this.elementStartAngle = 0;
+    this.elementCurrentAngle = 0;
+
+    this.ix = 0;
+    this.iy = 0;
     this.iWidth = 375;
     this.iHeight = 150;
 
@@ -57,8 +76,6 @@ export class DragResizeComponent implements OnInit {
     this.draggingImg = false;
     this.minArea = 20000;
   }
-
-  ngOnInit() {}
 
   area() {
     return this.width * this.height;
@@ -157,11 +174,23 @@ export class DragResizeComponent implements OnInit {
 
   onCornerClick(event: MouseEvent, resizer?: Function) {
     this.draggingCorner = true;
+
     this.px = event.clientX;
     this.py = event.clientY;
+
+    const center = this.getElementCenter();
+    const startXFromCenter = event.pageX - center.x;
+    const startYFromCenter = event.pageY - center.y;
+    this.mouseStartAngle = Math.atan2(startYFromCenter, startXFromCenter);
+    this.elementStartAngle = this.elementCurrentAngle;
+
     this.resizer = resizer;
     event.preventDefault();
     event.stopPropagation();
+  }
+
+  rotate(offsetX: number, offsetY: number, event: MouseEvent) {
+    this.elementCurrentAngle = this.calculateRotateAngle(event);
   }
 
   zoomIn() {
@@ -189,7 +218,8 @@ export class DragResizeComponent implements OnInit {
     const pWidth = this.width;
     const pHeight = this.height;
 
-    this.resizer(offsetX, offsetY);
+    this.resizer(offsetX, offsetY, event);
+
     if (this.area() < this.minArea) {
       this.x = lastX;
       this.y = lastY;
@@ -240,5 +270,28 @@ export class DragResizeComponent implements OnInit {
     ) {
       this.selected = false;
     }
+  }
+
+  private calculateRotateAngle(event: MouseEvent) {
+    const center = this.getElementCenter();
+
+    const xFromCenter = event.pageX - center.x;
+    const yFromCenter = event.pageY - center.y;
+    const mouseAngle = Math.atan2(yFromCenter, xFromCenter);
+    const rotateAngle =
+      mouseAngle - this.mouseStartAngle + this.elementStartAngle;
+
+    return rotateAngle;
+  }
+
+  private getElementCenter(): { x: number; y: number } {
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+
+    return { x: centerX, y: centerY };
+  }
+
+  private radiansToDegree(radians: number) {
+    return (radians * 180) / Math.PI;
   }
 }

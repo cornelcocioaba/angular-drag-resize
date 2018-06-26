@@ -67,6 +67,14 @@
   cursor: se-resize;
 }
 
+.handle-rotate {
+  top: -25px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
 img {
   position: relative;
   user-select: none;
@@ -101,7 +109,6 @@ img {
 }
 
 .img-dragging {
-  // opacity: 0.2;
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
@@ -112,6 +119,10 @@ img {
 
   &.img-container {
     overflow: visible;
+  }
+
+  img {
+    opacity: 0.8;
   }
 }
 

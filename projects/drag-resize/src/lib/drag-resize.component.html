@@ -1,5 +1,5 @@
-<div class="container" [style.top.px]='y' [style.left.px]='x' [style.width.px]='width' [style.height.px]='height' (mousedown)='onWindowPress($event)'
-  (mousemove)='onWindowDrag($event)'>
+<div class="container" [style.top.px]='y' [style.left.px]='x' [style.width.px]='width' [style.height.px]='height' [style.transform]='rotationTransform'
+  (mousedown)='onWindowPress($event)' (mousemove)='onWindowDrag($event)'>
   <div class="img-container" [ngClass]="{'img-dragging': draggingImg}">
     <img [src]="src" (dragstart)="$event.preventDefault();" (mousemove)='onImgDrag($event)' [style.top.px]='iy' [style.left.px]='ix'
       [style.width.px]='iWidth' [style.height.px]='iHeight'>
@@ -15,6 +15,7 @@
     <div class="handle handle-tr" (mousedown)='onCornerClick($event, topRightResize)'></div>
     <div class="handle handle-br" (mousedown)='onCornerClick($event, bottomRightResize)'></div>
     <div class="handle handle-bl" (mousedown)='onCornerClick($event, bottomLeftResize)'></div>
+    <div class="handle handle-rotate" (mousedown)='onCornerClick($event, rotate)'></div>
     <div class="control">
       <div class="zoom-in" (click)="zoomIn()"></div>
       <div class="zoom-out" (click)="zoomOut()"></div>
