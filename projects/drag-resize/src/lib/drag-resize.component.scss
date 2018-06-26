@@ -16,6 +16,7 @@
   left: 0;
   right: 0;
   margin: 0 auto;
+  cursor: n-resize;
 }
 
 .handle-r {
@@ -23,6 +24,7 @@
   top: 0;
   bottom: 0;
   margin: auto 0;
+  cursor: e-resize;
 }
 
 .handle-b {
@@ -30,6 +32,7 @@
   left: 0;
   right: 0;
   margin: 0 auto;
+  cursor: s-resize;
 }
 
 .handle-l {
@@ -37,26 +40,31 @@
   top: 0;
   bottom: 0;
   margin: auto 0;
+  cursor: w-resize;
 }
 
 .handle-tl {
   top: -6px;
   left: -6px;
+  cursor: nw-resize;
 }
 
 .handle-tr {
   top: -6px;
   right: -6px;
+  cursor: ne-resize;
 }
 
 .handle-bl {
   bottom: -6px;
   left: -6px;
+  cursor: sw-resize;
 }
 
 .handle-br {
   bottom: -6px;
   right: -6px;
+  cursor: se-resize;
 }
 
 img {
@@ -77,10 +85,26 @@ img {
   border-radius: 50%;
   background-color: #fff;
   z-index: 9999;
+
+  &:hover {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+
+  &:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
 }
 
 .img-dragging {
   // opacity: 0.2;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
 
   &.img-handle {
     display: none;

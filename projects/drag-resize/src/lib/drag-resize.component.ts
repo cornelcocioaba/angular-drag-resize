@@ -189,11 +189,6 @@ export class DragResizeComponent implements OnInit {
   }
 
   applyConstraints(offsetX: number, offsetY: number) {
-    const left = this.x;
-    const right = left + this.width;
-    const top = this.y;
-    const bottom = top + this.height;
-
     if (this.ix + this.iWidth < this.width) {
       this.ix = this.width - this.iWidth;
     }
@@ -201,19 +196,20 @@ export class DragResizeComponent implements OnInit {
     if (this.ix > 0) {
       this.ix = 0;
     }
+
     if (this.iy + this.iHeight < this.height) {
       this.iy = this.height - this.iHeight;
     }
+
     if (this.iy > 0) {
       this.iy = 0;
     }
 
     if (this.iHeight < this.height) {
-      // landscape
       this.iHeight = this.height;
     }
+
     if (this.iWidth < this.width) {
-      // portrait
       this.iWidth = this.width;
     }
   }
