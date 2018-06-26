@@ -15,5 +15,9 @@
     <div class="handle handle-tr" (mousedown)='onCornerClick($event, topRightResize)'></div>
     <div class="handle handle-br" (mousedown)='onCornerClick($event, bottomRightResize)'></div>
     <div class="handle handle-bl" (mousedown)='onCornerClick($event, bottomLeftResize)'></div>
+    <div class="control">
+      <div class="zoom-in" (click)="zoomIn()"></div>
+      <div class="zoom-out" (click)="zoomOut()"></div>
+    </div>
   </ng-container>
 </div>

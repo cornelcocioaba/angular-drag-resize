@@ -121,3 +121,23 @@ img {
   background: #000;
   overflow: hidden;
 }
+
+.control {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  bottom: -60px;
+  justify-content: space-evenly;
+
+  .zoom-in {
+    width: 50px;
+    height: 50px;
+    background: red;
+  }
+
+  .zoom-out {
+    width: 50px;
+    height: 50px;
+    background: green;
+  }
+}

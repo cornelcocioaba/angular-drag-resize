@@ -33,6 +33,8 @@ export class DragResizeComponent implements OnInit {
   draggingImg: boolean;
   resizer: Function;
 
+  resizePercentage = 0.2;
+
   get differentSize() {
     return this.width !== this.iWidth || this.height !== this.iHeight;
   }
@@ -108,7 +110,7 @@ export class DragResizeComponent implements OnInit {
     this.px = event.clientX;
     this.py = event.clientY;
 
-    this.applyConstraints(offsetX, offsetY);
+    this.applyConstraints();
   }
 
   topLeftResize(offsetX: number, offsetY: number) {
@@ -162,6 +164,18 @@ export class DragResizeComponent implements OnInit {
     event.stopPropagation();
   }
 
+  zoomIn() {
+    this.iWidth += this.iWidth * this.resizePercentage;
+    this.iHeight += this.iHeight * this.resizePercentage;
+    this.applyConstraints();
+  }
+
+  zoomOut() {
+    this.iWidth -= this.iWidth * this.resizePercentage;
+    this.iHeight -= this.iHeight * this.resizePercentage;
+    this.applyConstraints();
+  }
+
   @HostListener('document:mousemove', ['$event'])
   onCornerMove(event: MouseEvent) {
     if (!this.draggingCorner) {
@@ -185,10 +199,10 @@ export class DragResizeComponent implements OnInit {
     this.px = event.clientX;
     this.py = event.clientY;
 
-    this.applyConstraints(offsetX, offsetY);
+    this.applyConstraints();
   }
 
-  applyConstraints(offsetX: number, offsetY: number) {
+  applyConstraints() {
     if (this.ix + this.iWidth < this.width) {
       this.ix = this.width - this.iWidth;
     }
