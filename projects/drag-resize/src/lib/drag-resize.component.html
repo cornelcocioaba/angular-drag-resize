@@ -4,9 +4,16 @@
     <img [src]="src" (dragstart)="$event.preventDefault();" (mousemove)='onImgDrag($event)' [style.top.px]='iy' [style.left.px]='ix'
       [style.width.px]='iWidth' [style.height.px]='iHeight'>
   </div>
-  <div class="img-handle" *ngIf="differentSize" (mousedown)='onImgPress($event)' [ngClass]="{'img-dragging': draggingImg}"></div>
-  <div class="handle handle-tl" (mousedown)='onCornerClick($event, topLeftResize)'></div>
-  <div class="handle handle-tr" (mousedown)='onCornerClick($event, topRightResize)'></div>
-  <div class="handle handle-br" (mousedown)='onCornerClick($event, bottomRightResize)'></div>
-  <div class="handle handle-bl" (mousedown)='onCornerClick($event, bottomLeftResize)'></div>
+
+  <ng-container *ngIf="selected">
+    <div class="img-handle" *ngIf="differentSize" (mousedown)='onImgPress($event)' [ngClass]="{'img-dragging': draggingImg}"></div>
+    <div class="handle handle-t" (mousedown)='onCornerClick($event, topResize)'></div>
+    <div class="handle handle-r" (mousedown)='onCornerClick($event, rightResize)'></div>
+    <div class="handle handle-b" (mousedown)='onCornerClick($event, bottomResize)'></div>
+    <div class="handle handle-l" (mousedown)='onCornerClick($event, leftResize)'></div>
+    <div class="handle handle-tl" (mousedown)='onCornerClick($event, topLeftResize)'></div>
+    <div class="handle handle-tr" (mousedown)='onCornerClick($event, topRightResize)'></div>
+    <div class="handle handle-br" (mousedown)='onCornerClick($event, bottomRightResize)'></div>
+    <div class="handle handle-bl" (mousedown)='onCornerClick($event, bottomLeftResize)'></div>
+  </ng-container>
 </div>

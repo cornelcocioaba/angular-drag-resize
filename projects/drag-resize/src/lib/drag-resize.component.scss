@@ -1,6 +1,7 @@
 .container {
   position: fixed;
 }
+
 .handle {
   position: absolute;
   width: 10px;
@@ -9,30 +10,67 @@
   border-radius: 50%;
   background-color: #fff;
 }
+
+.handle-t {
+  top: -6px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.handle-r {
+  right: -6px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+.handle-b {
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.handle-l {
+  left: -6px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
 .handle-tl {
   top: -6px;
   left: -6px;
 }
+
 .handle-tr {
   top: -6px;
   right: -6px;
 }
+
 .handle-bl {
   bottom: -6px;
   left: -6px;
 }
+
 .handle-br {
   bottom: -6px;
   right: -6px;
 }
+
 img {
   position: relative;
   user-select: none;
 }
+
 .img-handle {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+  margin: auto;
   width: 30px;
   height: 30px;
   border: 2px solid #666666;

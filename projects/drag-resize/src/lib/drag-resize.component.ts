@@ -1,5 +1,10 @@
-import { Component, HostListener, OnInit, Input } from '@angular/core';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  Input,
+  ElementRef,
+} from '@angular/core';
 
 @Component({
   selector: 'dnr-drag-resize',
@@ -21,6 +26,7 @@ export class DragResizeComponent implements OnInit {
   iWidth: number;
   iHeight: number;
 
+  selected: boolean;
   minArea: number;
   draggingCorner: boolean;
   draggingWindow: boolean;
@@ -31,7 +37,7 @@ export class DragResizeComponent implements OnInit {
     return this.width !== this.iWidth || this.height !== this.iHeight;
   }
 
-  constructor() {
+  constructor(private elementRef: ElementRef) {
     this.x = 300;
     this.y = 300;
     this.ix = 0;
@@ -42,6 +48,8 @@ export class DragResizeComponent implements OnInit {
     this.height = 150;
     this.iWidth = 375;
     this.iHeight = 150;
+
+    this.selected = false;
     this.draggingCorner = false;
     this.draggingWindow = false;
     this.draggingImg = false;
@@ -55,6 +63,8 @@ export class DragResizeComponent implements OnInit {
   }
 
   onWindowPress(event: MouseEvent) {
+    this.selected = true;
+
     if (this.draggingImg) {
       return;
     }
@@ -106,6 +116,24 @@ export class DragResizeComponent implements OnInit {
     this.y += offsetY;
     this.width -= offsetX;
     this.height -= offsetY;
+  }
+
+  topResize(offsetX: number, offsetY: number) {
+    this.y += offsetY;
+    this.height -= offsetY;
+  }
+
+  rightResize(offsetX: number, offsetY: number) {
+    this.width += offsetX;
+  }
+
+  bottomResize(offsetX: number, offsetY: number) {
+    this.height += offsetY;
+  }
+
+  leftResize(offsetX: number, offsetY: number) {
+    this.x += offsetX;
+    this.width -= offsetX;
   }
 
   topRightResize(offsetX: number, offsetY: number) {
@@ -195,5 +223,12 @@ export class DragResizeComponent implements OnInit {
     this.draggingWindow = false;
     this.draggingCorner = false;
     this.draggingImg = false;
+
+    if (
+      this.elementRef &&
+      !this.elementRef.nativeElement.contains(event.target)
+    ) {
+      this.selected = false;
+    }
   }
 }
