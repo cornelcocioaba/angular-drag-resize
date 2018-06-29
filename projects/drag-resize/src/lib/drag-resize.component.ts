@@ -18,10 +18,21 @@ export class DragResizeComponent implements OnInit {
   px: number;
   py: number;
 
-  @HostBinding('style.left.px') x: number;
-  @HostBinding('style.top.px') y: number;
-  @HostBinding('style.width.px') width: number;
-  @HostBinding('style.height.px') height: number;
+  @HostBinding('style.left.px')
+  @Input()
+  x: number;
+
+  @HostBinding('style.top.px')
+  @Input()
+  y: number;
+
+  @HostBinding('style.width.px')
+  @Input()
+  width: number;
+
+  @HostBinding('style.height.px')
+  @Input()
+  height: number;
 
   ix: number;
   iy: number;
@@ -60,11 +71,6 @@ export class DragResizeComponent implements OnInit {
     this.px = 0;
     this.py = 0;
 
-    this.x = 300;
-    this.y = 300;
-    this.width = 375;
-    this.height = 150;
-
     this.rotating = false;
     this.mouseStartAngle = 0;
     this.elementStartAngle = 45;
@@ -72,8 +78,8 @@ export class DragResizeComponent implements OnInit {
 
     this.ix = 0;
     this.iy = 0;
-    this.iWidth = 375;
-    this.iHeight = 150;
+    this.iWidth = this.width;
+    this.iHeight = this.height;
 
     this.selected = false;
     this.draggingHandle = false;
@@ -227,6 +233,18 @@ export class DragResizeComponent implements OnInit {
     this.applyConstraints();
   }
 
+  @HostListener('document:mousedown')
+  onMouseDown() {
+    if (
+      !this.draggingHandle &&
+      !this.rotating &&
+      this.elementRef &&
+      !this.elementRef.nativeElement.contains(event.target)
+    ) {
+      this.selected = false;
+    }
+  }
+
   @HostListener('document:mousemove', ['$event'])
   onHandleMove(event: MouseEvent) {
     if (this.rotating) {
@@ -285,14 +303,6 @@ export class DragResizeComponent implements OnInit {
 
   @HostListener('document:mouseup', ['$event'])
   onHandleRelease(event: MouseEvent) {
-    if (
-      !this.draggingHandle &&
-      !this.rotating &&
-      this.elementRef &&
-      !this.elementRef.nativeElement.contains(event.target)
-    ) {
-      this.selected = false;
-    }
     this.draggingWindow = false;
     this.draggingHandle = false;
     this.draggingImg = false;
