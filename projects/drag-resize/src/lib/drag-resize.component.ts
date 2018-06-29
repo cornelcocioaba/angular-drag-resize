@@ -7,6 +7,14 @@ import {
   HostBinding,
 } from '@angular/core';
 
+export enum State {
+  DEFAULT,
+  DRAGGING,
+  RESIZING,
+  REPOSITIONING,
+  ROTATING,
+}
+
 @Component({
   selector: 'dnr-drag-resize',
   templateUrl: './drag-resize.component.html',
@@ -39,7 +47,6 @@ export class DragResizeComponent implements OnInit {
   iWidth: number;
   iHeight: number;
 
-  rotating: boolean;
   mouseStartAngle: number;
   elementStartAngle: number;
   elementCurrentAngle: number;
@@ -48,12 +55,15 @@ export class DragResizeComponent implements OnInit {
 
   minArea: number;
 
-  draggingHandle: boolean;
-  draggingWindow: boolean;
-  draggingImg: boolean;
   resizer: Function;
 
   resizePercentage = 0.2;
+
+  state: State;
+
+  get draggingImg() {
+    return this.state === State.REPOSITIONING;
+  }
 
   get differentSize() {
     return this.width !== this.iWidth || this.height !== this.iHeight;
@@ -68,10 +78,11 @@ export class DragResizeComponent implements OnInit {
   constructor(private elementRef: ElementRef) {}
 
   ngOnInit() {
+    this.state = State.DEFAULT;
+
     this.px = 0;
     this.py = 0;
 
-    this.rotating = false;
     this.mouseStartAngle = 0;
     this.elementStartAngle = 45;
     this.elementCurrentAngle = 0;
@@ -82,9 +93,6 @@ export class DragResizeComponent implements OnInit {
     this.iHeight = this.height;
 
     this.selected = false;
-    this.draggingHandle = false;
-    this.draggingWindow = false;
-    this.draggingImg = false;
     this.minArea = 20000;
   }
 
@@ -96,17 +104,51 @@ export class DragResizeComponent implements OnInit {
   onWindowPress(event: MouseEvent) {
     this.selected = true;
 
-    if (this.draggingImg) {
+    if (this.state === State.REPOSITIONING) {
       return;
     }
-    this.draggingWindow = true;
+    this.state = State.DRAGGING;
     this.px = event.clientX;
     this.py = event.clientY;
   }
 
-  @HostListener('mousemove', ['$event'])
-  onWindowDrag(event: MouseEvent) {
-    if (!this.draggingWindow) {
+  @HostListener('document:mousedown')
+  onMouseDown() {
+    if (
+      this.state !== State.RESIZING &&
+      this.state !== State.ROTATING &&
+      this.elementRef &&
+      !this.elementRef.nativeElement.contains(event.target)
+    ) {
+      this.selected = false;
+    }
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onHandleMove(event: MouseEvent) {
+    switch (this.state) {
+      case State.ROTATING:
+        this.rotate(event);
+        break;
+      case State.RESIZING:
+        this.resize(event);
+        break;
+      case State.DRAGGING:
+        this.drag(event);
+        break;
+      case State.REPOSITIONING:
+        this.imgDrag(event);
+        break;
+    }
+  }
+
+  @HostListener('document:mouseup', ['$event'])
+  onHandleRelease(event: MouseEvent) {
+    this.state = State.DEFAULT;
+  }
+
+  private drag(event: MouseEvent) {
+    if (this.state !== State.DRAGGING) {
       return;
     }
     const offsetX = event.clientX - this.px;
@@ -119,15 +161,14 @@ export class DragResizeComponent implements OnInit {
   }
 
   onImgPress(event: MouseEvent) {
-    this.draggingWindow = false;
-    this.draggingImg = true;
+    this.state = State.REPOSITIONING;
 
     this.px = event.clientX;
     this.py = event.clientY;
   }
 
-  onImgDrag(event: MouseEvent) {
-    if (!this.draggingImg) {
+  private imgDrag(event: MouseEvent) {
+    if (this.state !== State.REPOSITIONING) {
       return;
     }
 
@@ -186,7 +227,7 @@ export class DragResizeComponent implements OnInit {
   }
 
   onResizeHandleClick(event: MouseEvent, resizer?: Function) {
-    this.draggingHandle = true;
+    this.state = State.RESIZING;
 
     this.px = event.clientX;
     this.py = event.clientY;
@@ -197,7 +238,8 @@ export class DragResizeComponent implements OnInit {
   }
 
   onRotateHandleClick(event: MouseEvent) {
-    this.rotating = true;
+    this.state = State.ROTATING;
+
     this.mouseStartAngle = this.getAngle(event);
     this.elementStartAngle = this.elementCurrentAngle;
 
@@ -205,13 +247,13 @@ export class DragResizeComponent implements OnInit {
     event.stopPropagation();
   }
 
-  rotate(event: MouseEvent) {
+  private rotate(event: MouseEvent) {
     const mouseAngle = this.getAngle(event);
     this.elementCurrentAngle =
       mouseAngle - this.mouseStartAngle + this.elementStartAngle;
   }
 
-  getAngle(event: MouseEvent): number {
+  private getAngle(event: MouseEvent): number {
     const center = this.getElementCenter();
 
     const xFromCenter = event.pageX - center.x;
@@ -233,49 +275,30 @@ export class DragResizeComponent implements OnInit {
     this.applyConstraints();
   }
 
-  @HostListener('document:mousedown')
-  onMouseDown() {
-    if (
-      !this.draggingHandle &&
-      !this.rotating &&
-      this.elementRef &&
-      !this.elementRef.nativeElement.contains(event.target)
-    ) {
-      this.selected = false;
+  private resize(event: MouseEvent) {
+    const offsetX = event.clientX - this.px;
+    const offsetY = event.clientY - this.py;
+
+    const lastX = this.x;
+    const lastY = this.y;
+    const pWidth = this.width;
+    const pHeight = this.height;
+
+    this.resizer(offsetX, offsetY, event);
+
+    if (this.area() < this.minArea) {
+      this.x = lastX;
+      this.y = lastY;
+      this.width = pWidth;
+      this.height = pHeight;
     }
+    this.px = event.clientX;
+    this.py = event.clientY;
+
+    this.applyConstraints();
   }
 
-  @HostListener('document:mousemove', ['$event'])
-  onHandleMove(event: MouseEvent) {
-    if (this.rotating) {
-      this.rotate(event);
-    }
-
-    if (this.draggingHandle) {
-      const offsetX = event.clientX - this.px;
-      const offsetY = event.clientY - this.py;
-
-      const lastX = this.x;
-      const lastY = this.y;
-      const pWidth = this.width;
-      const pHeight = this.height;
-
-      this.resizer(offsetX, offsetY, event);
-
-      if (this.area() < this.minArea) {
-        this.x = lastX;
-        this.y = lastY;
-        this.width = pWidth;
-        this.height = pHeight;
-      }
-      this.px = event.clientX;
-      this.py = event.clientY;
-
-      this.applyConstraints();
-    }
-  }
-
-  applyConstraints() {
+  private applyConstraints() {
     if (this.ix + this.iWidth < this.width) {
       this.ix = this.width - this.iWidth;
     }
@@ -299,14 +322,6 @@ export class DragResizeComponent implements OnInit {
     if (this.iWidth < this.width) {
       this.iWidth = this.width;
     }
-  }
-
-  @HostListener('document:mouseup', ['$event'])
-  onHandleRelease(event: MouseEvent) {
-    this.draggingWindow = false;
-    this.draggingHandle = false;
-    this.draggingImg = false;
-    this.rotating = false;
   }
 
   private getElementCenter(): { x: number; y: number } {

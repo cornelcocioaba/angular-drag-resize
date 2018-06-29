@@ -2,7 +2,6 @@
      [ngClass]="{'img-dragging': draggingImg}">
   <img [src]="src"
        (dragstart)="$event.preventDefault();"
-       (mousemove)="onImgDrag($event)"
        [style.top.px]="iy"
        [style.left.px]="ix"
        [style.width.px]="iWidth"
