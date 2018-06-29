@@ -4,6 +4,7 @@ import {
   OnInit,
   Input,
   ElementRef,
+  HostBinding,
 } from '@angular/core';
 
 @Component({
@@ -17,10 +18,10 @@ export class DragResizeComponent implements OnInit {
   px: number;
   py: number;
 
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  @HostBinding('style.left.px') x: number;
+  @HostBinding('style.top.px') y: number;
+  @HostBinding('style.width.px') width: number;
+  @HostBinding('style.height.px') height: number;
 
   ix: number;
   iy: number;
@@ -47,6 +48,7 @@ export class DragResizeComponent implements OnInit {
     return this.width !== this.iWidth || this.height !== this.iHeight;
   }
 
+  @HostBinding('style.transform')
   get rotationTransform() {
     const degrees = this.radiansToDegree(this.elementCurrentAngle);
     return `rotate(${degrees}deg)`;
@@ -65,7 +67,7 @@ export class DragResizeComponent implements OnInit {
 
     this.rotating = false;
     this.mouseStartAngle = 0;
-    this.elementStartAngle = 0;
+    this.elementStartAngle = 45;
     this.elementCurrentAngle = 0;
 
     this.ix = 0;
@@ -84,8 +86,8 @@ export class DragResizeComponent implements OnInit {
     return this.width * this.height;
   }
 
+  @HostListener('mousedown', ['$event'])
   onWindowPress(event: MouseEvent) {
-    console.log(this.elementRef.nativeElement.getBoundingClientRect());
     this.selected = true;
 
     if (this.draggingImg) {
@@ -96,6 +98,7 @@ export class DragResizeComponent implements OnInit {
     this.py = event.clientY;
   }
 
+  @HostListener('mousemove', ['$event'])
   onWindowDrag(event: MouseEvent) {
     if (!this.draggingWindow) {
       return;
