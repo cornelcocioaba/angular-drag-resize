@@ -24,31 +24,31 @@
          [ngClass]="{'img-dragging': draggingImg}"></div>
 
     <div class="handle handle-t"
-         (mousedown)="onCornerClick($event, topResize)"></div>
+         (mousedown)="onResizeHandleClick($event, topResize)"></div>
 
     <div class="handle handle-r"
-         (mousedown)="onCornerClick($event, rightResize)"></div>
+         (mousedown)="onResizeHandleClick($event, rightResize)"></div>
 
     <div class="handle handle-b"
-         (mousedown)="onCornerClick($event, bottomResize)"></div>
+         (mousedown)="onResizeHandleClick($event, bottomResize)"></div>
 
     <div class="handle handle-l"
-         (mousedown)="onCornerClick($event, leftResize)"></div>
+         (mousedown)="onResizeHandleClick($event, leftResize)"></div>
 
     <div class="handle handle-tl"
-         (mousedown)="onCornerClick($event, topLeftResize)"></div>
+         (mousedown)="onResizeHandleClick($event, topLeftResize)"></div>
 
     <div class="handle handle-tr"
-         (mousedown)="onCornerClick($event, topRightResize)"></div>
+         (mousedown)="onResizeHandleClick($event, topRightResize)"></div>
 
     <div class="handle handle-br"
-         (mousedown)="onCornerClick($event, bottomRightResize)"></div>
+         (mousedown)="onResizeHandleClick($event, bottomRightResize)"></div>
 
     <div class="handle handle-bl"
-         (mousedown)="onCornerClick($event, bottomLeftResize)"></div>
+         (mousedown)="onResizeHandleClick($event, bottomLeftResize)"></div>
 
     <div class="handle handle-rotate"
-         (mousedown)="onCornerClick($event, rotate)"></div>
+         (mousedown)="onRotateHandleClick($event)"></div>
 
     <div class="control">
       <div class="zoom-in"

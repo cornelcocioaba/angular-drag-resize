@@ -14,27 +14,29 @@ import {
 export class DragResizeComponent implements OnInit {
   @Input() src: string;
 
-  x: number;
-  y: number;
   px: number;
   py: number;
+
+  x: number;
+  y: number;
   width: number;
   height: number;
-
-  mouseStartAngle: number;
-  elementStartAngle: number;
-  elementCurrentAngle: number;
 
   ix: number;
   iy: number;
   iWidth: number;
   iHeight: number;
 
+  rotating: boolean;
+  mouseStartAngle: number;
+  elementStartAngle: number;
+  elementCurrentAngle: number;
+
   selected: boolean;
 
   minArea: number;
 
-  draggingCorner: boolean;
+  draggingHandle: boolean;
   draggingWindow: boolean;
   draggingImg: boolean;
   resizer: Function;
@@ -61,6 +63,7 @@ export class DragResizeComponent implements OnInit {
     this.width = 375;
     this.height = 150;
 
+    this.rotating = false;
     this.mouseStartAngle = 0;
     this.elementStartAngle = 0;
     this.elementCurrentAngle = 0;
@@ -71,7 +74,7 @@ export class DragResizeComponent implements OnInit {
     this.iHeight = 150;
 
     this.selected = false;
-    this.draggingCorner = false;
+    this.draggingHandle = false;
     this.draggingWindow = false;
     this.draggingImg = false;
     this.minArea = 20000;
@@ -82,6 +85,7 @@ export class DragResizeComponent implements OnInit {
   }
 
   onWindowPress(event: MouseEvent) {
+    console.log(this.elementRef.nativeElement.getBoundingClientRect());
     this.selected = true;
 
     if (this.draggingImg) {
@@ -172,25 +176,40 @@ export class DragResizeComponent implements OnInit {
     this.height += offsetY;
   }
 
-  onCornerClick(event: MouseEvent, resizer?: Function) {
-    this.draggingCorner = true;
+  onResizeHandleClick(event: MouseEvent, resizer?: Function) {
+    this.draggingHandle = true;
 
     this.px = event.clientX;
     this.py = event.clientY;
-
-    const center = this.getElementCenter();
-    const startXFromCenter = event.pageX - center.x;
-    const startYFromCenter = event.pageY - center.y;
-    this.mouseStartAngle = Math.atan2(startYFromCenter, startXFromCenter);
-    this.elementStartAngle = this.elementCurrentAngle;
 
     this.resizer = resizer;
     event.preventDefault();
     event.stopPropagation();
   }
 
-  rotate(offsetX: number, offsetY: number, event: MouseEvent) {
-    this.elementCurrentAngle = this.calculateRotateAngle(event);
+  onRotateHandleClick(event: MouseEvent) {
+    this.rotating = true;
+    this.mouseStartAngle = this.getAngle(event);
+    this.elementStartAngle = this.elementCurrentAngle;
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  rotate(event: MouseEvent) {
+    const mouseAngle = this.getAngle(event);
+    this.elementCurrentAngle =
+      mouseAngle - this.mouseStartAngle + this.elementStartAngle;
+  }
+
+  getAngle(event: MouseEvent): number {
+    const center = this.getElementCenter();
+
+    const xFromCenter = event.pageX - center.x;
+    const yFromCenter = event.pageY - center.y;
+    const mouseAngle = Math.atan2(yFromCenter, xFromCenter);
+
+    return mouseAngle;
   }
 
   zoomIn() {
@@ -206,30 +225,33 @@ export class DragResizeComponent implements OnInit {
   }
 
   @HostListener('document:mousemove', ['$event'])
-  onCornerMove(event: MouseEvent) {
-    if (!this.draggingCorner) {
-      return;
+  onHandleMove(event: MouseEvent) {
+    if (this.rotating) {
+      this.rotate(event);
     }
-    const offsetX = event.clientX - this.px;
-    const offsetY = event.clientY - this.py;
 
-    const lastX = this.x;
-    const lastY = this.y;
-    const pWidth = this.width;
-    const pHeight = this.height;
+    if (this.draggingHandle) {
+      const offsetX = event.clientX - this.px;
+      const offsetY = event.clientY - this.py;
 
-    this.resizer(offsetX, offsetY, event);
+      const lastX = this.x;
+      const lastY = this.y;
+      const pWidth = this.width;
+      const pHeight = this.height;
 
-    if (this.area() < this.minArea) {
-      this.x = lastX;
-      this.y = lastY;
-      this.width = pWidth;
-      this.height = pHeight;
+      this.resizer(offsetX, offsetY, event);
+
+      if (this.area() < this.minArea) {
+        this.x = lastX;
+        this.y = lastY;
+        this.width = pWidth;
+        this.height = pHeight;
+      }
+      this.px = event.clientX;
+      this.py = event.clientY;
+
+      this.applyConstraints();
     }
-    this.px = event.clientX;
-    this.py = event.clientY;
-
-    this.applyConstraints();
   }
 
   applyConstraints() {
@@ -259,29 +281,19 @@ export class DragResizeComponent implements OnInit {
   }
 
   @HostListener('document:mouseup', ['$event'])
-  onCornerRelease(event: MouseEvent) {
-    this.draggingWindow = false;
-    this.draggingCorner = false;
-    this.draggingImg = false;
-
+  onHandleRelease(event: MouseEvent) {
     if (
+      !this.draggingHandle &&
+      !this.rotating &&
       this.elementRef &&
       !this.elementRef.nativeElement.contains(event.target)
     ) {
       this.selected = false;
     }
-  }
-
-  private calculateRotateAngle(event: MouseEvent) {
-    const center = this.getElementCenter();
-
-    const xFromCenter = event.pageX - center.x;
-    const yFromCenter = event.pageY - center.y;
-    const mouseAngle = Math.atan2(yFromCenter, xFromCenter);
-    const rotateAngle =
-      mouseAngle - this.mouseStartAngle + this.elementStartAngle;
-
-    return rotateAngle;
+    this.draggingWindow = false;
+    this.draggingHandle = false;
+    this.draggingImg = false;
+    this.rotating = false;
   }
 
   private getElementCenter(): { x: number; y: number } {
