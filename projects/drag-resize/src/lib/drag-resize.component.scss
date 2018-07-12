@@ -1,0 +1,154 @@
+:host {
+  position: fixed;
+}
+
+.handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #666666;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.handle-t {
+  top: -6px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  cursor: n-resize;
+}
+
+.handle-r {
+  right: -6px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  cursor: e-resize;
+}
+
+.handle-b {
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  cursor: s-resize;
+}
+
+.handle-l {
+  left: -6px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  cursor: w-resize;
+}
+
+.handle-tl {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
+}
+
+.handle-tr {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.handle-bl {
+  bottom: -6px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+.handle-br {
+  bottom: -6px;
+  right: -6px;
+  cursor: se-resize;
+}
+
+.handle-rotate {
+  top: -25px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+img {
+  position: relative;
+  user-select: none;
+}
+
+.img-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #666666;
+  border-radius: 50%;
+  background-color: #fff;
+  z-index: 9999;
+
+  &:hover {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+
+  &:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
+}
+
+.img-dragging {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+
+  &.img-handle {
+    display: none;
+  }
+
+  &.img-container {
+    overflow: visible;
+  }
+
+  img {
+    opacity: 0.8;
+  }
+}
+
+.img-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+.control {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  bottom: -60px;
+  justify-content: space-evenly;
+
+  .zoom-in {
+    width: 50px;
+    height: 50px;
+    background: red;
+  }
+
+  .zoom-out {
+    width: 50px;
+    height: 50px;
+    background: green;
+  }
+}

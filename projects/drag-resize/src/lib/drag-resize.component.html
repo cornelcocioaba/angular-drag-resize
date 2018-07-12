@@ -1,0 +1,51 @@
+<div class="img-container"
+     [ngClass]="{'img-dragging': draggingImg}">
+  <img [src]="src"
+       (dragstart)="$event.preventDefault();"
+       [style.top.px]="iy"
+       [style.left.px]="ix"
+       [style.width.px]="iWidth"
+       [style.height.px]="iHeight">
+</div>
+
+<ng-container *ngIf="selected">
+  <div class="img-handle"
+       *ngIf="differentSize"
+       (mousedown)="onImgPress($event)"
+       [ngClass]="{'img-dragging': draggingImg}"></div>
+
+  <div class="handle handle-t"
+       (mousedown)="onResizeHandleClick($event, topResize)"></div>
+
+  <div class="handle handle-r"
+       (mousedown)="onResizeHandleClick($event, rightResize)"></div>
+
+  <div class="handle handle-b"
+       (mousedown)="onResizeHandleClick($event, bottomResize)"></div>
+
+  <div class="handle handle-l"
+       (mousedown)="onResizeHandleClick($event, leftResize)"></div>
+
+  <div class="handle handle-tl"
+       (mousedown)="onResizeHandleClick($event, topLeftResize)"></div>
+
+  <div class="handle handle-tr"
+       (mousedown)="onResizeHandleClick($event, topRightResize)"></div>
+
+  <div class="handle handle-br"
+       (mousedown)="onResizeHandleClick($event, bottomRightResize)"></div>
+
+  <div class="handle handle-bl"
+       (mousedown)="onResizeHandleClick($event, bottomLeftResize)"></div>
+
+  <div class="handle handle-rotate"
+       (mousedown)="onRotateHandleClick($event)"></div>
+
+  <div class="control">
+    <div class="zoom-in"
+         (click)="zoomIn()"></div>
+
+    <div class="zoom-out"
+         (click)="zoomOut()"></div>
+  </div>
+</ng-container>
